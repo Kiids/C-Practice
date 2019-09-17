@@ -2,16 +2,18 @@
 #include<iostream>
 using namespace std;
 
+// 实现一个简单的string
+// 传统写法
 // 深浅拷贝
 namespace my
 {
 	class string
 	{
 	public:
-		string(const char* str = "")  // ""是一个空字符串，含有一个'\0'
+		string(const char* str = "")        // ""是一个空字符串，含有一个'\0'
 			:_str(new char[strlen(str)+1])
 		{
-			strcpy(_str, str);  // 字符串复制，while (*dst++ = *src++); 拷贝了'\0'
+			strcpy(_str, str);              // 字符串复制，while (*dst++ = *src++); 拷贝了'\0'
 		}
 
 		~string()
@@ -20,7 +22,7 @@ namespace my
 			_str = nullptr;
 		}
 
-		string(const string& s)  // 拷贝构造函数的深拷贝
+		string(const string& s)             // 拷贝构造函数的深拷贝
 			:_str(new char[strlen(s._str)+1])
 		{
 			strcpy(_str, s._str);
@@ -53,7 +55,7 @@ namespace my
 	};
 }
 
-void Test()
+void Test1()
 {
 	my::string s1("hello");
 	cout << s1.c_str() << endl;
