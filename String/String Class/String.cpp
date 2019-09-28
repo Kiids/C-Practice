@@ -4,7 +4,7 @@
 #include "MyString.h"
 #include "my_string.h"
 
-// 模拟实现string，包含增删查改
+// 模拟实现string，包含增删改查
 namespace mine
 {
 	class string
@@ -81,7 +81,7 @@ namespace mine
 			return *this;
 		}
 
-		const char* c_str()
+		const char* c_str() const
 		{
 			return _str;
 		}
@@ -98,7 +98,7 @@ namespace mine
 			return _str[pos];
 		}
 
-		size_t size()
+		size_t size() const
 		{
 			return _size;
 		}
@@ -273,14 +273,17 @@ namespace mine
 			{
 				return false;
 			}
-			/*else if (*str2)
+
+			/*
+			else if (*str2)
 			{
 			return false;
 			}
 			else
 			{
 			return false;
-			}*/
+			}
+			*/
 		}
 
 		bool operator==(const string& s) const
@@ -317,24 +320,124 @@ namespace mine
 
 		size_t find(char ch)
 		{
+			for (size_t i = 0; i < _size; i++)
+				if (_str[i] == ch)
+					return i;
 
+			return string::npos;
 		}
 
-		size_t find(const char* str) // strstr ->kmp   
+		//size_t find(const char* str) // strstr -> kmp   
+		//{
+		//	const char* pos = strstr(_str, str);
+		//	if (pos == nullptr)
+		//		return npos;
+		//	else
+		//		return pos - _str;
+		//}
+
+		size_t find(const char* str) // strstr -> kmp   
 		{
+			const char* src = _str;
+			const char* dst = str;
+			size_t srclen = _size;
+			size_t dstlen = strlen(dst);
 
+			size_t srcindex = 0;
+			while (srcindex < srclen)
+			{
+				/*if (src[srcindex] == dst[0])
+				{
+					size_t i = srcindex;
+					size_t j = 0;
+					while (j < dstlen && src[i] == dst[j])
+					{
+						++i;
+						++j;
+					}
+
+					if (j == dstlen)
+					{
+						return srcindex;
+					}
+					else
+					{
+						++srcindex;
+					}
+				}
+				else
+				{
+					srcindex++;
+				}*/
+
+				size_t i = srcindex;
+				size_t j = 0;
+				while (j < dstlen && src[i] == dst[j])
+				{
+					++i;
+					++j;
+				}
+
+				if (j == dstlen)
+				{
+					return srcindex;
+				}
+				
+			    srcindex++;
+			}
+
+			return npos;
 		}
 
-		// operator+
-		// operator<<
-		// operator>>
 		// getline
 
 	private:
 		char* _str;
 		size_t _size;
 		size_t _capacity;
+
+		static size_t npos;
 	};
+
+	size_t string::npos = -1;
+
+	// s1 + s2
+	string operator+(const string& s1, const string& s2)
+	{
+		string ret = s1;
+		ret += s2;
+		return ret;
+	}
+
+	ostream& operator<<(ostream& out, const string& s)
+	{
+		// out << s.c_str();  这样不可以，遇到\0会停止输出
+		for (size_t i = 0; i < s.size(); i++)
+		{
+			out << s[i];
+		}
+
+		return out;
+	}
+/*   还需要调试
+	istream& operator>>(istream& in, string& s)
+	{
+		char ch;
+		while (in.get(ch))
+		{
+			if (ch == ' ' || ch == '\n')
+			{
+				in.clear();
+
+				return in;
+			}
+			else
+				s += ch;
+		}
+
+		return in;
+	}
+*/
 }
 
 
@@ -389,6 +492,13 @@ void test2()
 	cout << s2.c_str() << endl;
 	s2.insert(0, "bit");
 	cout << s2.c_str() << endl;
+}
+
+void test3()
+{
+	mine::string s1("hello world worxxxy");
+	cout << s1.find("wor") << endl;
+	cout << s1.find("worx") << endl;
 }
 
 int main()
