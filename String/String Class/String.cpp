@@ -3,6 +3,7 @@
 #include <cassert>
 #include "MyString.h"
 #include "my_string.h"
+using std::setw;
 
 // 模拟实现string，包含增删改查
 namespace mine
@@ -419,25 +420,41 @@ namespace mine
 
 		return out;
 	}
-/*   还需要调试
+
+   // 以下输入运算符重载还需要调试
 	istream& operator>>(istream& in, string& s)
 	{
-		char ch;
-		while (in.get(ch))
-		{
-			if (ch == ' ' || ch == '\n')
-			{
-				in.clear();
+		//char ch;
+		//while (in.get(ch))
+		//{
+		//	if (ch == ' ' || ch == '\n')
+		//	{
+		//		in.clear();
 
-				return in;
-			}
-			else
-				s += ch;
-		}
+		//		return in;
+		//	}
+		//	else
+		//		s += ch;
+		//}
 
+		//return in;
+
+		char temp[100];
+		in >> setw(100) >> temp; 
+		/*
+		见
+		在C++中，setw(int n)用来控制输出间隔。
+		例如:
+		cout<<'s'<<setw(8)<<'a'<<endl;
+		则在屏幕显示
+		s a
+		s与a之间有7个空格，setw()只对其后面紧跟的输出产生作用，如上例中，表示'a'共占8个位置，不足的用空格填充。若输入的内容超过setw()设置的长度，则按实际长度输出。
+		setw()默认填充的内容为空格，可以setfill()配合使用设置其他字符填充。
+		*/
+		s = temp;
 		return in;
 	}
-*/
+
 }
 
 
