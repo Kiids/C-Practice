@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include "vertor.h"
 #include <stdlib.h>
-using namespace zsq;
+using namespace mine;
 
 int main()
 {

@@ -1,14 +1,18 @@
 #pragma once
 #include <iostream>
 #include <assert.h>
-using namespace std;
+using std::cout;
+using std::endl;
 
-namespace zsq
+
+namespace mine
 {
+	// 类模板
 	template<class T>
 	class vector
 	{
 	public:
+		// 迭代器
 		typedef T* iterator;
 
 		vector()
@@ -19,6 +23,7 @@ namespace zsq
 		
 		}
 
+		// 拷贝构造
 		vector(const vector<T>& v)
 		{
 			_start = new T[v.size()];
@@ -27,7 +32,7 @@ namespace zsq
 			_end_of_storage = _start + v.size();
 		}
 
-		// v1 = v2
+		// 重载=运算符，现代写法
 		vector<T>& operator=(vector<T> v)
 		{
 			swap(v);
@@ -43,7 +48,7 @@ namespace zsq
 			}
 		}
 
-		// v1.swap(v2)
+		// 交换函数，现代写法 v1.swap(v2)
 		void swap(vector<T>& v)
 		{
 			swap(_start, v._start);
@@ -96,6 +101,7 @@ namespace zsq
 			}
 		}
 
+		// 尾插
 		void push_back(const T& x)
 		{
 			if (_finish == _end_of_storage)
@@ -109,6 +115,7 @@ namespace zsq
 			//insert(end(), x);
 		}
 
+		// 尾删
 		void pop_back()
 		{
 			assert(_finish > _start);
@@ -117,6 +124,7 @@ namespace zsq
 			//erase(--end());
 		}
 
+		// 指定位置插入
 		void insert(iterator pos, const T& x)
 		{
 			assert(pos >= _start && pos <= _finish);
@@ -138,6 +146,7 @@ namespace zsq
 			++_finish;
 		}
 
+		// 指定位置删除
 		void erase(iterator pos)
 		{
 			assert(pos < _finish && pos >= _start);
@@ -160,6 +169,7 @@ namespace zsq
 			return _end_of_storage - _start;
 		}
 
+		// 重载运算符[]
 		T& operator[](size_t pos)
 		{
 			return _start[pos];
