@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <assert.h>
 
 namespace mine
 {
@@ -62,14 +63,14 @@ namespace mine
 		}
 
 		// 前置--
-		Self& operator++()
+		Self& operator--()
 		{
 			_node = _node->_prev;
 			return *this;
 		}
 
 		// 后置--
-		Self operator++(int)
+		Self operator--(int)
 		{
 			__list_iterator<T> tmp(*this);
 			_node = _node->_prev;
@@ -119,8 +120,8 @@ namespace mine
 		list(const list<T>& l)
 		{
 			_head = new node;
-			_head->next = _head;
-			_head->prev = _head;
+			_head->_next = _head;
+			_head->_prev = _head;
 
 			const_iterator it = l.begin();
 			//auto it = l.begin();
@@ -154,8 +155,8 @@ namespace mine
 		list()
 		{
 			_head = new node(T());
-			_head->next = _head;
-			_head->prev = _head;
+			_head->_next = _head;
+			_head->_prev = _head;
 		}
 
 		~list()
@@ -205,7 +206,7 @@ namespace mine
 			node* cur = pos._node;
 			node* newnode = new node(x);
 
-			cur->_prev->next = newnode;
+			cur->_prev->_next = newnode;
 			newnode->_prev = cur->_prev;
 			newnode->_next = cur;
 			cur->_prev = newnode;
@@ -217,11 +218,13 @@ namespace mine
 			node* cur = pos._node;
 			assert(cur != _head);  // 防止删除头节点
 
+			node* next = cur->_next;
+
 			cur->_prev->_next = cur->_next;
 			cur->_next->_prev = cur->_prev;
 
 			delete cur;
-			reuurn iterator(next);
+			return iterator(next);
 		}
 
 	private:
@@ -240,20 +243,21 @@ namespace mine
 		std::cout << std::endl;
 	}
 
-
 	void test_list1()
 	{
+		printf("test1:\n");
 		list<int> l;
 		l.push_back(1);
 		l.push_back(2);
 		l.push_back(3);
 		l.push_back(4);
+		l.push_back(5);
 		print(l);
 
 		list<int>::iterator it = l.begin();
 		while (it != l.end())
 		{
-			if (*it % 2 == 0)
+			if (*it % 2 == 1)
 			{
 				it = l.erase(it);
 			}
@@ -275,34 +279,31 @@ namespace mine
 
 	void test_list2()
 	{
+		printf("\ntest2:\n");
 		list<Date> l;
 		l.push_back(Date());
-		l.push_back(Date());
 
-		//list<Date>::iterator it = l.begin();
-		auto it = l.begin();
+		//auto it = l.begin();
+		list<Date>::iterator it = l.begin();
 		while (it != l.end())
 		{
-			//cout << *it << endl;
 			std::cout << it->_year << "-" << it->_month << "-" << it->_day << std::endl;
 			++it;
 		}
-
-		//int* p *p
-		//Date* p p->_year;
 	}
 
 	void test_list3()
 	{
+		printf("\ntest3:\n");
 		list<int> l;
 		l.push_back(1);
 		l.push_back(2);
 		l.push_back(3);
 		l.push_back(4);
-		//print_list(l);
+		l.push_back(5);
 
 		list<int> copy = l;
-		l.push_back(5);
+		l.push_back(6);
 
 		print(copy);
 		print(l);
