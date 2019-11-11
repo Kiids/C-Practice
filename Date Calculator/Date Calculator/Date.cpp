@@ -1,10 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include "Date.h"
 
-
-
-
-
 bool Date::operator<(const Date& d)
 {
 	if (_year < d._year)
@@ -166,7 +162,7 @@ int Date::operator-(const Date& d)
 	Date max(d);
 	int flag = -1;
 	int count = 0;
-	if (d < *this)
+	if (max < *this)
 	{
 		min = d;
 		max = *this;
