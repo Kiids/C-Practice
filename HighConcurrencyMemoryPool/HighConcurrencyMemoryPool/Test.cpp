@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include "ThreadCache.h"
+#include "Concurrency.h"
 #include <vector>
 
 void UnitTestSizeClass()
@@ -65,7 +66,7 @@ void UnitThreadCache()
 
 	for (size_t i = 0; i < v.size(); ++i)
 	{
-		printf("[%d]->%p\n", i, v[i]);
+		printf("[%d] ---> %p\n", i, v[i]);
 	}
 
 	for (auto ptr : v)
@@ -77,8 +78,6 @@ void UnitThreadCache()
 
 	v.push_back(tc.Allocte(size));
 }
-
-#include "Concurrency.h"
 
 void func1(size_t n)
 {
@@ -126,7 +125,6 @@ void func2(size_t n)
 
 int main()
 {
-	//UnitThreadCache();
 	//UnitTestSizeClass();
 	//UnitTestSystemAlloc();
 	//UnitThreadCache();

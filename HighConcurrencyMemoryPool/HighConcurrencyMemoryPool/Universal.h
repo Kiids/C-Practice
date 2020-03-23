@@ -16,9 +16,9 @@ using std::endl;
 using std::cout;
 
 const size_t MAX_SIZE = 64 * 1024;
-const size_t FREE_LIST = MAX_SIZE / 6;
+const size_t FREE_LIST = MAX_SIZE / 8;
 const size_t MAX_PAGES = 129;
-const size_t PAGE_SHIFT = 12;  // 4k的页移位
+const size_t PAGE_SHIFT = 12;  // 4k页移位
 
 // 获取下一个节点指针
 inline void*& Next(void* obj)
@@ -56,12 +56,12 @@ public:
 		_num += num;
 	}
 
-	size_t PopScope(void*& start, void* end, size_t num)  // 删除一段范围的节点
+	size_t PopScope(void*& start, void*& end, size_t num)  // 删除一段范围的节点
 	{
 		size_t actualNum = 0;  // 实际删除节点数量
 		void* prev = nullptr;
 		void* cur = _freelist;
-		for (; actualNum < num && cur != nullptr; ++actualNum)
+		for (; actualNum < num && cur != nullptr; actualNum++)
 		{
 			prev = cur;
 			cur = Next(cur);
@@ -98,22 +98,22 @@ class SizeClass
 {
 public:
 	// 以8进行对齐，计算映射在自由链表的具体位置，计算效率低
-	static size_t ListIndex_No(size_t size)
-	{
-		if (size % 8 == 0)
-			return size / 8 - 1;
-		else
-			return size / 8;
-	}
+	//static size_t ListIndex_No(size_t size)
+	//{
+	//	if (size % 8 == 0)
+	//		return size / 8 - 1;
+	//	else
+	//		return size / 8;
+	//}
 
-	// 以8进行对齐，计算对齐后的大小，计算效率低
-	static size_t RoundUp_No(size_t size)
-	{
-		if (size % 8 != 0)
-			return (size / 8 + 1) * 8;
-		else
-			return size;
-	}
+	//// 以8进行对齐，计算对齐后的大小，计算效率低
+	//static size_t RoundUp_No(size_t size)
+	//{
+	//	if (size % 8 != 0)
+	//		return (size / 8 + 1) * 8;
+	//	else
+	//		return size;
+	//}
 
 	// 控制[1%，10%]左右内碎片浪费
 	// [1,128]  8字节对齐  自由链表[0,16)
@@ -198,13 +198,13 @@ public:
 	static size_t NumMovePage(size_t size)
 	{
 		size_t num = NumMoveSize(size);
-		size_t npage = num*size;
+		size_t nPage = num * size;
 
-		npage >>= 12;
-		if (npage == 0)
-			npage = 1;
+		nPage >>= 12;
+		if (nPage == 0)
+			nPage = 1;
 
-		return npage;
+		return nPage;
 	}
 };
 
@@ -238,7 +238,7 @@ class SpanList
 {
 private:
 	Span* _head;      // 头指针
-	std::mutex _mtx;  // 互斥锁
+	std::mutex _mutex;  // 互斥锁
 
 public:
 	SpanList()  // 构造函数，初始化变量
@@ -258,9 +258,9 @@ public:
 		return _head;
 	}
 
-	void PushFront(Span* newspan)  // 头插
+	void PushFront(Span* newSpan)  // 头插
 	{
-		Insert(_head->_next, newspan);
+		Insert(_head->_next, newSpan);
 	}
 
 	void PopFront()  // 头删
@@ -268,9 +268,9 @@ public:
 		Erase(_head->_next);
 	}
 
-	void PushBack(Span* newspan)  // 尾插
+	void PushBack(Span* newSpan)  // 尾插
 	{
-		Insert(_head, newspan);
+		Insert(_head, newSpan);
 	}
 
 	void PopBack()  // 尾删
@@ -278,20 +278,25 @@ public:
 		Erase(_head->_prev);
 	}
 
-	void Insert(Span* pos, Span* newspan)  // 任意位置插入
+	void Insert(Span* pos, Span* newSpan)  // 任意位置插入
 	{
-		pos->_prev->_next = newspan;
-		newspan->_next = pos;
-		pos->_prev = newspan;
-		newspan->_prev = pos->_prev;
+		Span* prev = pos->_prev;
+
+		prev->_next = newSpan;
+		newSpan->_next = pos;
+		pos->_prev = newSpan;
+		newSpan->_prev = prev;
 	}
 
 	void Erase(Span* pos)  // 任意位置删除
 	{
 		assert(pos != _head);
 
-		pos->_prev->_next = pos->_next;
-		pos->_next->_prev = pos->_prev;
+		Span* prev = pos->_prev;
+		Span* next = pos->_next;
+
+		prev->_next = next;
+		next->_prev = prev;
 	}
 
 	bool Empty()  // 判空
@@ -301,12 +306,12 @@ public:
 
 	void Lock()  // 加锁
 	{
-		_mtx.lock();
+		_mutex.lock();
 	}
 
 	void Unlock()  // 解锁
 	{
-		_mtx.unlock();
+		_mutex.unlock();
 	}
 };
 
