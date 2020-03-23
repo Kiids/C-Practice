@@ -18,6 +18,7 @@ Span* CentralCache::GetOneSpan(size_t size)
 	// 从page cache获取一个span
 	size_t numPage = SizeClass::NumMovePage(size);
 	Span* span = PageCache::GetInstance().NewSpan(numPage);
+
 	// 把span对象切成相应大小挂到span的自由链表中
 	char* start = (char*)(span->_pageid << 12);
 	char* end = start + (span->_pagesize << 12);
@@ -78,6 +79,5 @@ void CentralCache::ReleaseListToSpans(void* start, size_t size)
 
 		start = next;
 	}
-
 	spanList.Unlock();  // 解锁
 }
