@@ -8,9 +8,6 @@ class ThreadCache
 private:
 	FreeList _freeLists[FREE_LIST];  // 线程获取内存的自由链表
 
-	//ThreadCache* _next;
-	//int threadid;
-
 public:
 	void* Allocte(size_t size);              // 申请内存
 	void Deallocte(void* ptr, size_t size);  // 释放内存
@@ -22,7 +19,7 @@ public:
 // ThreadCache* tclist = nullptr;
 // 线程TLS Thread Local Storage 保证效率
 
-_declspec (thread) static ThreadCache* pThreaCache = nullptr;
+_declspec (thread) static ThreadCache* pThreadCache = nullptr;
 
 // 线程局部存储（Thread Local Storage，TLS）用来将数据与一个正在执行的指定线程关联起来。
 // 主要是为了避免多个线程同时访存同一全局变量或者静态变量时所导致的冲突，尤其是多个线程同时需要修改这一变量时。

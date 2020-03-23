@@ -4,7 +4,7 @@
 // 申请空间
 void* ThreadCache::Allocte(size_t size)
 {
-	size_t index = SizeClass::ListIndex(size);
+	size_t index = SizeClass::ListIndex(size);  // 根据开空间的大小计算自由链表的索引下标
 	FreeList& freeList = _freeLists[index];
 	if (!freeList.Empty())
 		return freeList.Pop();
@@ -16,7 +16,7 @@ void* ThreadCache::Allocte(size_t size)
 // 释放空间
 void ThreadCache::Deallocte(void* ptr, size_t size)
 {
-	size_t index = SizeClass::ListIndex(size); // ?
+	size_t index = SizeClass::ListIndex(size);  // 根据大小计算索引
 	FreeList& freeList = _freeLists[index];
 	freeList.Push(ptr);
 
@@ -29,7 +29,7 @@ void ThreadCache::Deallocte(void* ptr, size_t size)
 // 判断链表长度
 void ThreadCache::ListTooLong(FreeList& freeList, size_t num, size_t size)
 {
-	void* start = nullptr, *end = nullptr;
+	void *start = nullptr, *end = nullptr;
 	freeList.PopScope(start, end, num);
 
 	Next(end) = nullptr;
@@ -41,7 +41,7 @@ void* ThreadCache::GetFromCentralCache(size_t size)
 {
 	size_t num = SizeClass::NumMoveSize(size);
 
-	void* start = nullptr, *end = nullptr;
+	void *start = nullptr, *end = nullptr;
 	size_t actualNum = CentralCache::GetInstance().GetRangeObj(start, end, num, size);
 
 	if (actualNum == 1)
