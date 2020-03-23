@@ -10,7 +10,7 @@ Span* PageCache::_NewSpan(size_t numPage)
 		return span;
 	}
 
-	for (size_t i = numPage + 1; i < MAX_PAGES; ++i)
+	for (size_t i = numPage + 1; i < MAX_PAGES; i++)
 	{
 		if (!_spanLists[i].Empty())
 		{
@@ -21,10 +21,8 @@ Span* PageCache::_NewSpan(size_t numPage)
 			Span* splitSpan = new Span;
 			splitSpan->_pageid = span->_pageid + span->_pagesize - numPage;
 			splitSpan->_pagesize = numPage;
-			for (PAGE_ID i = 0; i < numPage; ++i)
-			{
+			for (PAGE_ID i = 0; i < numPage; i++)
 				_idSpanMap[splitSpan->_pageid + i] = splitSpan;
-			}
 
 			span->_pagesize -= numPage;
 
@@ -40,7 +38,7 @@ Span* PageCache::_NewSpan(size_t numPage)
 	bigSpan->_pageid = (PAGE_ID)p >> PAGE_SHIFT;
 	bigSpan->_pagesize = MAX_PAGES - 1;
 
-	for (PAGE_ID i = 0; i < bigSpan->_pagesize; ++i)
+	for (PAGE_ID i = 0; i < bigSpan->_pagesize; i++)
 		_idSpanMap[bigSpan->_pageid + i] = bigSpan;
 
 	_spanLists[bigSpan->_pagesize].PushFront(bigSpan);
@@ -65,26 +63,24 @@ void PageCache::ReleaseSpanToPageCache(Span* span)
 	while (1)
 	{
 		PAGE_ID prevPageId = span->_pageid - 1;
-		auto pit = _idSpanMap.find(prevPageId);
+		auto it = _idSpanMap.find(prevPageId);
 		// 不存在前面的页
-		if (pit == _idSpanMap.end())
+		if (it == _idSpanMap.end())
 			break;
 
 		// 前一个还在使用中，不能合并
-		Span* prevSpan = pit->second;
+		Span* prevSpan = it->second;
 		if (prevSpan->_usecount != 0)
 			break;
 
-		// 合并，但如果合并之后的span超过128页，则不合并
+		// 合并，但如果合并之后的span超过128页/最大页，则不合并
 		if (span->_pagesize + prevSpan->_pagesize >= MAX_PAGES)
 			break;
 
 		span->_pageid = prevSpan->_pageid;
 		span->_pagesize += prevSpan->_pagesize;
-		for (PAGE_ID i = 0; i < prevSpan->_pagesize; ++i)
-		{
+		for (PAGE_ID i = 0; i < prevSpan->_pagesize; i++)
 			_idSpanMap[prevSpan->_pageid + i] = span;
-		}
 
 		_spanLists[prevSpan->_pagesize].Erase(prevSpan);
 		delete prevSpan;
